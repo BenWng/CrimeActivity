@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Ben_Big on 12/16/16.
@@ -23,7 +24,7 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
     private static final int REQUEST_CRIME=1;
-
+    private UUID mCrimeId;
 
 
     @Override
@@ -57,7 +58,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         }
         else{
-            mAdapter.notifyDataSetChanged();
+            mAdapter.updateItemChanged(mCrimeId);
         }
     }
 
@@ -94,7 +95,8 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v){
-            Intent intent=CrimeActivity.createIntent(getActivity(),mCrime.getId());
+            mCrimeId=mCrime.getId();
+            Intent intent=CrimeActivity.createIntent(getActivity(),mCrimeId);
             startActivityForResult(intent,REQUEST_CRIME);
         }
     }
@@ -133,7 +135,17 @@ public class CrimeListFragment extends Fragment {
         public int getItemCount(){
             return mCrimes.size();
         }
-    }
 
+
+        public void updateItemChanged(UUID id){
+            int position=0;
+            for (int i=0;i<mCrimes.size();i++){
+                if (mCrimes.get(i).getId().equals(id)){
+                    position=i;
+                }
+            }
+            notifyItemChanged(position);
+        }
+    }
 
 }
