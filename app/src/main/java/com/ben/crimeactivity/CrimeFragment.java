@@ -55,6 +55,28 @@ public class CrimeFragment extends Fragment {
         mCrime=CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
+
+    private String removeTime(Date date){
+        String[] dateComponents=mCrime.getDate().toString().split(" ");
+        String dateWithoutTime="";
+        for (int i=0;i<dateComponents.length;i++){
+            if (i==0) dateWithoutTime+=dateComponents[i];
+            else if (i!=3 && i!=4) dateWithoutTime=dateWithoutTime+" "+dateComponents[i];
+        }
+        return dateWithoutTime;
+    }
+
+    private String removeDate(Date date){
+        String[] dateComponents=mCrime.getDate().toString().split(" ");
+        String onlyTime="";
+        for (int i=0;i<dateComponents.length;i++){
+            if (i==3) onlyTime+=dateComponents[i];
+            else if (i==4) onlyTime=onlyTime+" "+dateComponents[i];
+        }
+        return onlyTime;
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -83,19 +105,11 @@ public class CrimeFragment extends Fragment {
         });
 
 
-        String[] dateComponents=mCrime.getDate().toString().split(" ");
-        String dateWithoutTime="";
-        String onlyTime="";
-        for (int i=0;i<dateComponents.length;i++){
-            if (i==0) dateWithoutTime+=dateComponents[i];
-            else if (i==3) onlyTime+=dateComponents[i];
-            else if (i==4) onlyTime=onlyTime+" "+dateComponents[i];
-            else dateWithoutTime=dateWithoutTime+" "+dateComponents[i];
-        }
+
 
 
         mDateButton = (Button) v.findViewById(R.id.crime_date);
-        mDateButton.setText(dateWithoutTime);
+        mDateButton.setText(removeTime(mCrime.getDate()));
         mDateButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -107,11 +121,11 @@ public class CrimeFragment extends Fragment {
         });
 
         mTimeButton= (Button) v.findViewById(R.id.crime_time);
-        mTimeButton.setText(onlyTime);
+        mTimeButton.setText(removeDate(mCrime.getDate()));
         mTimeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                TimePickerFragment dialog=new TimePickerFragment();
+                TimePickerFragment dialog=TimePickerFragment.newInstance(mCrime.getDate());
                 FragmentManager manager=getFragmentManager();
                 dialog.show(manager,DIALOG_TIME);
             }
@@ -147,7 +161,7 @@ public class CrimeFragment extends Fragment {
         if (requestCode==REQUEST_DATE){
             Date date=(Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
-            mDateButton.setText(mCrime.getDate().toString());
+            mDateButton.setText(removeTime(mCrime.getDate()));
         }
     }
 
