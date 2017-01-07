@@ -30,6 +30,9 @@ public class CrimeFragment extends Fragment {
     private static final String DIALOG_TIME="DialogTime";
 
     private static final int REQUEST_DATE=0;
+    private static final int REQUEST_TIME=1;
+
+
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -126,6 +129,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View v){
                 TimePickerFragment dialog=TimePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this,REQUEST_TIME);
                 FragmentManager manager=getFragmentManager();
                 dialog.show(manager,DIALOG_TIME);
             }
@@ -163,6 +167,15 @@ public class CrimeFragment extends Fragment {
             mCrime.setDate(date);
             mDateButton.setText(removeTime(mCrime.getDate()));
         }
+
+        if (requestCode==REQUEST_TIME){
+            Date date=(Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            mCrime.setDate(date);
+            mTimeButton.setText(removeDate(mCrime.getDate()));
+
+        }
+
+
     }
 
 

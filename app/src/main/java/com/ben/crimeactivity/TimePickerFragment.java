@@ -1,8 +1,10 @@
 package com.ben.crimeactivity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -21,6 +23,7 @@ import java.util.GregorianCalendar;
 public class TimePickerFragment extends DialogFragment {
     private static final String ARG_DATE="date";
     private TimePicker mTimePicker;
+    public static final String EXTRA_TIME="com.ben.android.criminalintent.time";
 
 
 
@@ -78,10 +81,23 @@ public class TimePickerFragment extends DialogFragment {
                             minute=mTimePicker.getMinute();
                         }
                         Date date=new GregorianCalendar(year,month,day,hour,minute).getTime();
-
+                        sendResult(Activity.RESULT_OK,date);
                     }
                 })
                 .create();
+    }
+
+    private void sendResult(int resultCode, Date date){
+        if (getTargetFragment()==null){
+            return;
+        }
+
+        Intent intent=new Intent();
+        intent.putExtra(EXTRA_TIME,date);
+
+        getTargetFragment()
+                .onActivityResult(getTargetRequestCode(),resultCode,intent);
+
     }
 
 }
