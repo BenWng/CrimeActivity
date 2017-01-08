@@ -38,6 +38,7 @@ public class CrimeFragment extends Fragment {
     private EditText mTitleField;
     private Button mDateButton;
     private Button mTimeButton;
+    private Button mDeleteButton;
     private CheckBox mSolvedCheckBox;
 
 
@@ -143,6 +144,19 @@ public class CrimeFragment extends Fragment {
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     mCrime.setSolved(isChecked);
                 }
+        });
+
+
+        mDeleteButton=(Button) v.findViewById(R.id.delete_crime);
+        mDeleteButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent data=new Intent();
+                data.putExtra(CrimePagerActivity.EXTRA_CRIME_DEL,true);
+                data.putExtra(CrimePagerActivity.EXTRA_CRIME_DEL_ID,mCrime.getId());
+                getActivity().setResult(Activity.RESULT_OK,data);
+                getActivity().finish();
+            }
         });
 
 

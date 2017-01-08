@@ -1,6 +1,7 @@
 package com.ben.crimeactivity;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,6 +33,7 @@ public class CrimeListFragment extends Fragment {
     private UUID mCrimeId;
     private boolean newCrimeAdded=false;
     private static final String SAVED_SUBTITLE_VISIBLE="subtitle";
+    private boolean mIsDeleted=false;
 
 
     @Override
@@ -83,6 +85,10 @@ public class CrimeListFragment extends Fragment {
         if(mAdapter==null) {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
+        }
+        else if (mIsDeleted){
+            mAdapter.notifyDataSetChanged();
+            mIsDeleted=false;
         }
         else if (mCrimeId==null){
             int numCrimes=crimes.size();
@@ -139,8 +145,18 @@ public class CrimeListFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (resultCode!= Activity.RESULT_OK){
+            return;
+        }
         if (requestCode==REQUEST_CRIME){
-
+            if (data==null){
+                return;
+            }
+            mIsDeleted=data.getBooleanExtra(CrimePagerActivity.EXTRA_CRIME_DEL,false);
+            if (mIsDeleted){
+                mCrimeId=(UUID) data.getSerializableExtra(CrimePagerActivity.EXTRA_CRIME_DEL_ID);
+                CrimeLab.get(getActivity()).deleteCrime(mCrimeId);
+            }
         }
     }
 
@@ -207,7 +223,7 @@ public class CrimeListFragment extends Fragment {
                 Crime crime=new Crime();
                 CrimeLab.get(getActivity()).addCrime(crime);
                 Intent intent=CrimePagerActivity.createIntent(getActivity(),crime.getId());
-                startActivity(intent);
+                startActivityForResult(intent,REQUEST_CRIME);
                 return true;
             case R.id.menu_item_show_subtitle:
                 mSubtitleVisible=!mSubtitleVisible;
@@ -222,8 +238,8 @@ public class CrimeListFragment extends Fragment {
     private void updateSubtitle(){
         CrimeLab crimeLab=CrimeLab.get(getActivity());
         int crimeCount=crimeLab.getCrimes().size();
-        //String subtitle=getString(R.string.subtitle_format,crimeCount);
-        String subtitle=""+crimeCount+" crimes";
+        String subtitle=getString(R.string.subtitle_format,crimeCount);
+        //String subtitle=""+crimeCount+" crimes";
 
         if(!mSubtitleVisible){
             subtitle=null;
